@@ -1,17 +1,6 @@
-//    Program       : Mindwave with Arduino                //
-
-//    Interfacing   : HC-05 Bluetooth Module               //
-
-//    Output        : Eye Blink Control LED                //
-
- 
-
 #define   BAUDRATE           57600
-
 #define   LED                13
-
 #define   Theshold_Eyeblink  125
-
 #define   EEG_AVG            70
 
 #define GREENLED1  8
@@ -68,156 +57,81 @@ long Temp,Avg_Raw,Temp_Avg;
 
  }
 
- 
-
- byte ReadOneByte()           // One Byte Read Function
-
+  byte ReadOneByte()           // One Byte Read Function
  {
-
    int ByteRead;
-
    while(!Serial.available());
-
    ByteRead = Serial.read();
-
    return ByteRead;
-
  }
 
- 
-
- void loop()                     // Main Function
-
+void loop()                     // Main Function
  {
-
    if(ReadOneByte() == 170)        // AA 1 st Sync data
-
    {
-
      if(ReadOneByte() == 170)      // AA 2 st Sync data
-
      {
-
        Plength = ReadOneByte();
-
        if(Plength == 4)   // Small Packet
-
        {
-
          Small_Packet ();
-
        }
-
        else    // Big Packet
-
        {
-
          Big_Packet ();
-
        }
-
      }
-
    }        
-
  }
-
- 
 
  void Small_Packet ()
-
  {
-
    generatedchecksum = 0;
-
    for(int i = 0; i < Plength; i++)
-
    { 
-
      payloadDataS[i]     = ReadOneByte();      //Read payload into memory
-
      generatedchecksum  += payloadDataS[i] ;
-
-   }
-
+  }
    generatedchecksum = 255 - generatedchecksum;
-
    checksum  = ReadOneByte();
-
    if(checksum == generatedchecksum)        // Varify Checksum
-
    { 
-
-     
      if (j<512)
-
      {
-
        Raw_data  = ((payloadDataS[2] <<8)| payloadDataS[3]);
-
        if(Raw_data&0xF000)
-
        {
-
          Raw_data = (((~Raw_data)&0xFFF)+1);
-
        }
-
        else
-
        {
-
          Raw_data = (Raw_data&0xFFF);
-
        }
-
        Temp += Raw_data;
-
        j++;
-
      }
-
      else
-
      {
-
        Onesec_Rawval_Fun ();
-
      }
-
    }
-
  }
 
- 
-
  void Big_Packet()
-
  {
-
    generatedchecksum = 0;
-
    for(int i = 0; i < Plength; i++)
-
    { 
-
      payloadDataB[i]     = ReadOneByte();      //Read payload into memory
-
      generatedchecksum  += payloadDataB[i] ;
-
    }
-
    generatedchecksum = 255 - generatedchecksum;
-
    checksum  = ReadOneByte();
-
    if(checksum == generatedchecksum)        // Varify Checksum
-
    {
      Poorquality = 200;
         attention = 0;
         meditation = 0;
-
         for(int i = 0; i < Plength; i++) {    // Parse the payload
           switch (payloadDataB[i]) {
           case 2:
@@ -249,14 +163,6 @@ long Temp,Avg_Raw,Temp_Avg;
             digitalWrite(PS, HIGH);
           else
             digitalWrite(PS, LOW);
-//          Serial.print("PoorQuality: ");
-//          Serial.print(poorQuality, DEC);
-//          Serial.print(" Attention: ");
-//          Serial.print(attention, DEC);
-//          Serial.print(" Time since last packet: ");
-//          Serial.print(millis() - lastReceivedPacket, DEC);
-//          lastReceivedPacket = millis();
-//          Serial.print("\n");
 
           switch(attention / 10) {
           case 0:
@@ -266,11 +172,6 @@ long Temp,Avg_Raw,Temp_Avg;
             digitalWrite(GREENLED3, LOW);
             digitalWrite(YELLOWLED1, LOW);
             digitalWrite(YELLOWLED2, LOW);
-//            digitalWrite(FWD, LOW);
-//            digitalWrite(RT, LOW);
-//            digitalWrite(REDLED1, LOW);
-//            digitalWrite(REDLED2, LOW);
-//            digitalWrite(REDLED3, LOW);           
             break;
           case 2:
           case 3:
@@ -279,11 +180,6 @@ long Temp,Avg_Raw,Temp_Avg;
             digitalWrite(GREENLED3, LOW);
             digitalWrite(YELLOWLED1, LOW);
             digitalWrite(YELLOWLED2, LOW);
-//            digitalWrite(FWD, LOW);
-//            digitalWrite(RT, LOW);
-//            digitalWrite(REDLED1, LOW);
-//            digitalWrite(REDLED2, LOW);
-//            digitalWrite(REDLED3, LOW);
             break;
           case 4:
           case 5:
@@ -292,11 +188,6 @@ long Temp,Avg_Raw,Temp_Avg;
             digitalWrite(GREENLED3, HIGH);
             digitalWrite(YELLOWLED1, LOW);
             digitalWrite(YELLOWLED2, LOW);
-//            digitalWrite(FWD, LOW);
-//            digitalWrite(RT, LOW);
-//            digitalWrite(REDLED1, LOW);
-//            digitalWrite(REDLED2, LOW);
-//            digitalWrite(REDLED3, LOW);
             break;
           case 6:
           case 7:              
@@ -305,11 +196,6 @@ long Temp,Avg_Raw,Temp_Avg;
             digitalWrite(GREENLED3, HIGH);              
             digitalWrite(YELLOWLED1, HIGH);
             digitalWrite(YELLOWLED2, LOW);
-//            digitalWrite(FWD, LOW);
-//            digitalWrite(RT, LOW);
-//            digitalWrite(REDLED1, LOW);
-//            digitalWrite(REDLED2, LOW);
-//            digitalWrite(REDLED3, LOW);             
             break;
           case 8:
           case 9:
@@ -318,223 +204,88 @@ long Temp,Avg_Raw,Temp_Avg;
             digitalWrite(GREENLED2, HIGH);
             digitalWrite(GREENLED3, HIGH);              
             digitalWrite(YELLOWLED1, HIGH);
-            digitalWrite(YELLOWLED2, HIGH);
-//            digitalWrite(FWD, LOW);
-//            digitalWrite(RT, LOW);
-//            digitalWrite(REDLED1, LOW);
-//            digitalWrite(REDLED2, LOW);
-//            digitalWrite(REDLED3, LOW);              
+            digitalWrite(YELLOWLED2, HIGH);           
             break;
-//          case 5:
-//            digitalWrite(GREENLED1, HIGH);
-//            digitalWrite(GREENLED2, HIGH);
-//            digitalWrite(GREENLED3, HIGH);              
-//            digitalWrite(YELLOWLED1, HIGH);
-//            digitalWrite(YELLOWLED2, HIGH);
-//            digitalWrite(FWD, HIGH);
-//            digitalWrite(RT, LOW);
-//            digitalWrite(REDLED1, LOW);
-//            digitalWrite(REDLED2, LOW);
-//            digitalWrite(REDLED3, LOW);               
-//            break;
-//          case 6:              
-//            digitalWrite(GREENLED1, HIGH);
-//            digitalWrite(GREENLED2, HIGH);
-//            digitalWrite(GREENLED3, HIGH);              
-//            digitalWrite(YELLOWLED1, HIGH);
-//            digitalWrite(YELLOWLED2, HIGH);
-//            digitalWrite(FWD, HIGH);
-//            digitalWrite(RT, HIGH);
-//            digitalWrite(REDLED1, LOW);
-//            digitalWrite(REDLED2, LOW);
-//            digitalWrite(REDLED3, LOW);              
-//            break;
-//          case 7:
-//            digitalWrite(GREENLED1, HIGH);
-//            digitalWrite(GREENLED2, HIGH);
-//            digitalWrite(GREENLED3, HIGH);              
-//            digitalWrite(YELLOWLED1, HIGH);
-//            digitalWrite(YELLOWLED2, HIGH);
-//            digitalWrite(FWD, HIGH);
-//            digitalWrite(RT, HIGH);
-//            digitalWrite(REDLED1, HIGH);
-//            digitalWrite(REDLED2, LOW);
-//            digitalWrite(REDLED3, LOW);              
-//            break;    
-//          case 8:
-//            digitalWrite(GREENLED1, HIGH);
-//            digitalWrite(GREENLED2, HIGH);
-//            digitalWrite(GREENLED3, HIGH);              
-//            digitalWrite(YELLOWLED1, HIGH);
-//            digitalWrite(YELLOWLED2, HIGH);
-//            digitalWrite(FWD, HIGH);
-//            digitalWrite(RT, HIGH);
-//            digitalWrite(REDLED1, HIGH);
-//            digitalWrite(REDLED2, HIGH);
-//            digitalWrite(REDLED3, LOW);
-//            break;
-//          case 9:
-//            digitalWrite(GREENLED1, HIGH);
-//            digitalWrite(GREENLED2, HIGH);
-//            digitalWrite(GREENLED3, HIGH);              
-//            digitalWrite(YELLOWLED1, HIGH);
-//            digitalWrite(YELLOWLED2, HIGH);
-//            digitalWrite(FWD, HIGH);
-//            digitalWrite(RT, HIGH);
-//            digitalWrite(REDLED1, HIGH);
-//            digitalWrite(REDLED2, HIGH); 
-//            digitalWrite(REDLED3, HIGH);
-//            break;
-//          case 10:
-//            digitalWrite(GREENLED1, HIGH);
-//            digitalWrite(GREENLED2, HIGH);
-//            digitalWrite(GREENLED3, HIGH);              
-//            digitalWrite(YELLOWLED1, HIGH);
-//            digitalWrite(YELLOWLED2, HIGH);
-//            digitalWrite(FWD, HIGH);
-//            digitalWrite(RT, HIGH);
-//            digitalWrite(REDLED1, HIGH);
-//            digitalWrite(REDLED2, HIGH); 
-//            digitalWrite(REDLED3, HIGH);
-//            break;           
           }                     
         }
      drive();
      if (Poorquality==0 )
-
      {
-
        Eye_Enable = 1;
-
      }
-
      else
-
      {
-
        Eye_Enable = 0;
-
      }
-
    }
-
  }
-
- 
 
  void Onesec_Rawval_Fun ()
-
  {
-
    Avg_Raw = Temp/512;
-
    if (On_Flag==0 && Off_Flag==1)
-
    {
-
      if (n<3)
-
      {
-
        Temp_Avg += Avg_Raw;
-
        n++;
-
      }
-
      else
-
      {
-
        Temp_Avg = Temp_Avg/3;
-
        if (Temp_Avg<EEG_AVG)
-
        {
-
          On_Flag=1;Off_Flag=0;
-
        }
-
        n=0;Temp_Avg=0;
-
      } 
-
    }             
    Eye_Blink ();
-
    j=0;
-
    Temp=0;
-
  }
 
- 
-
  void Eye_Blink ()
-
  {
-
    if (Eye_Enable)         
-
    {
-
      if (On_Flag==1 && Off_Flag==0)
-
      {
-
        if ((Avg_Raw>Theshold_Eyeblink) && (Avg_Raw<350))
-
        {
          bflag=1;
          digitalWrite(LED,HIGH);
          blinkc++;
          drive();
-
        }
-
        else
-
        {
-
          if (Avg_Raw>350)
-
          {
-
            On_Flag==0;Off_Flag==1;
-
          }
          bflag=0;
          drive();
          digitalWrite(LED,LOW);
-
        }
-
      }
-
      else
-
      {
        //blinkc=0;
        bflag=0;
        drive();
        digitalWrite(LED,LOW);
-
      }
-
    }       
-
    else
-
    {
      //blinkc=0;
      bflag=0;
      drive();
      digitalWrite(LED,LOW);
-
    }
-
  }
+
  void drive()
  {
   if(attention>30)
@@ -621,4 +372,3 @@ long Temp,Avg_Raw,Temp_Avg;
     digitalWrite(ST, HIGH);
   }
  }
-
